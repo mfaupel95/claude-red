@@ -332,7 +332,7 @@ Scheduled tasks running as SYSTEM with writable actions or misconfigured permiss
 schtasks /query /fo LIST /v > C:\Users\Public\tasks.txt
 
 # Find tasks running as SYSTEM
-schtasks /query /fo LIST /v | findstr /i "SYSTEM" -B 5
+schtasks /query /fo LIST /v | Select-String -Pattern 'SYSTEM' -Context 5,0
 
 # Check permissions on task action binaries
 icacls "C:\Path\To\Task\Binary.exe"

@@ -7,7 +7,7 @@
 **Offensive security skills for Claude — drop-in `SKILL.md` files that turn Claude into a context-aware red team operator.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-78-red.svg)](#skill-index)
+[![Skills](https://img.shields.io/badge/skills-79-red.svg)](#skill-index)
 [![Categories](https://img.shields.io/badge/categories-23-orange.svg)](#categories)
 [![Stars](https://img.shields.io/github/stars/SnailSploit/claude-red?style=social)](https://github.com/SnailSploit/claude-red)
 [![Forks](https://img.shields.io/github/forks/SnailSploit/claude-red?style=social)](https://github.com/SnailSploit/claude-red/network/members)
@@ -75,7 +75,7 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 |---|---:|---|
 | [Web Application](#web-application) | 16 | OWASP Top 10, business logic, advanced web vulnerability classes |
 | [Auth & Identity](#auth--identity) | 2 | JWT exploitation, OAuth/OIDC abuse |
-| [Active Directory](#active-directory) | 1 | On-prem AD attack methodology |
+| [Active Directory](#active-directory) | 2 | On-prem AD attack methodology and NetExec |
 | [Wireless](#wireless) | 14 | 802.11, WPA2/3, EAP, WPS, evil-twin, BLE, Zigbee, Z-Wave, LoRa, sub-GHz |
 | [Cloud](#cloud) | 1 | AWS, Azure, GCP attack paths |
 | [Mobile](#mobile) | 1 | Android and iOS application testing |
@@ -86,13 +86,13 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 | [Reconnaissance](#reconnaissance) | 2 | OSINT tooling and structured intelligence collection |
 | [API Security](#api-security) | 2 | REST/gRPC/WebSocket testing, business logic abuse |
 | [Container & Kubernetes](#container--kubernetes) | 2 | Container escape, Kubernetes cluster exploitation |
-| [CI/CD & Pipeline](#cicd--pipeline) | 2 | Pipeline exploitation, secrets extraction |
+| [CI/CD & Pipeline](#cicd--pipeline) | 2 | Pipeline permissions, secret exposure prevention |
 | [Cryptography](#cryptography) | 2 | Cryptographic implementation attacks, TLS/SSL |
 | [Privilege Escalation](#privilege-escalation) | 2 | Linux and Windows privilege escalation |
 | [Post-Exploitation](#post-exploitation) | 3 | Lateral movement, persistence mechanisms, data exfiltration |
-| [Forensics & C2](#forensics--c2) | 2 | Anti-forensics tradecraft, C2 framework operations |
-| [Supply Chain](#supply-chain) | 2 | Supply chain attacks, dependency confusion |
-| [Social Engineering](#social-engineering) | 2 | Phishing campaigns, physical/vishing/smishing |
+| [Forensics & C2](#forensics--c2) | 2 | Evidence preservation and command-and-control detection |
+| [Supply Chain](#supply-chain) | 2 | Dependency-source controls and software provenance |
+| [Social Engineering](#social-engineering) | 2 | Phishing awareness and non-deceptive tabletop exercises |
 | [Network Attacks](#network-attacks) | 1 | Layer 2/3 attacks, MITM, protocol poisoning |
 | [AI Security](#ai-security) | 1 | Prompt injection, jailbreaking, RAG poisoning |
 | [Utility](#utility) | 2 | Fast triage checklists, professional reporting |
@@ -140,6 +140,7 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 | Skill | Description |
 |---|---|
 | [`offensive-active-directory`](Skills/active-directory/offensive-active-directory/SKILL.md) | AD methodology — Kerberoast, ASREProast, ACL abuse, ADCS ESC1-15, delegation, hybrid AAD |
+| [`offensive-netexec`](Skills/active-directory/offensive-netexec/SKILL.md) | NetExec — authorized protocol/module assessment reference |
 
 ### Wireless
 
@@ -195,7 +196,7 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 | [`offensive-initial-access`](Skills/infrastructure/offensive-initial-access/SKILL.md) | Initial access — phishing payloads, drive-by delivery, supply chain vectors (TA0001) |
 | [`offensive-advanced-redteam`](Skills/infrastructure/offensive-advanced-redteam/SKILL.md) | Full kill chain — C2 infrastructure, OPSEC, lateral movement, persistence |
 | [`offensive-edr-evasion`](Skills/infrastructure/offensive-edr-evasion/SKILL.md) | EDR evasion — userland unhooking, indirect syscalls, PPID spoofing |
-| [`offensive-shellcode`](Skills/infrastructure/offensive-shellcode/SKILL.md) | Shellcode — writing, encoding, injection techniques, position-independent code |
+| [`offensive-shellcode`](Skills/infrastructure/offensive-shellcode/SKILL.md) | Shellcode — static analysis, telemetry interpretation, and mitigation review for isolated labs |
 | [`offensive-keylogger-arch`](Skills/infrastructure/offensive-keylogger-arch/SKILL.md) | Input capture — keylogger architecture, hooking mechanisms |
 | [`offensive-windows-mitigations`](Skills/infrastructure/offensive-windows-mitigations/SKILL.md) | Windows mitigations — ACG, CIG, CFG, CET bypass techniques |
 | [`offensive-windows-boundaries`](Skills/infrastructure/offensive-windows-boundaries/SKILL.md) | Windows boundary defeat — sandbox escape, integrity level bypass |
@@ -258,7 +259,7 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 | Skill | Description |
 |---|---|
 | [`offensive-cicd-pipeline`](Skills/cicd/offensive-cicd-pipeline/SKILL.md) | CI/CD exploitation — GitHub Actions injection, Jenkins RCE, GitLab CI abuse |
-| [`offensive-cicd-secrets`](Skills/cicd/offensive-cicd-secrets/SKILL.md) | CI/CD secrets — environment variable extraction, vault misconfigs, runner token abuse |
+| [`offensive-cicd-secrets`](Skills/cicd/offensive-cicd-secrets/SKILL.md) | CI/CD secret exposure — read-only configuration audit and secret-safe controls |
 
 ### Cryptography
 
@@ -294,8 +295,8 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 
 | Skill | Description |
 |---|---|
-| [`offensive-anti-forensics`](Skills/forensics/offensive-anti-forensics/SKILL.md) | Anti-forensics — log manipulation, timestomping, ADS abuse, memory cleanup |
-| [`offensive-c2-frameworks`](Skills/forensics/offensive-c2-frameworks/SKILL.md) | C2 tradecraft — Cobalt Strike, Sliver, Mythic, Havoc, redirectors, domain fronting |
+| [`offensive-anti-forensics`](Skills/forensics/offensive-anti-forensics/SKILL.md) | Forensic tampering — detection and evidence preservation |
+| [`offensive-c2-frameworks`](Skills/forensics/offensive-c2-frameworks/SKILL.md) | C2 activity — defensive telemetry review and detection coverage |
 
 ### Supply Chain
 
@@ -303,8 +304,8 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 
 | Skill | Description |
 |---|---|
-| [`offensive-supply-chain`](Skills/supply-chain/offensive-supply-chain/SKILL.md) | Supply chain attacks — dependency confusion, typosquatting, build system compromise |
-| [`offensive-dependency-confusion`](Skills/supply-chain/offensive-dependency-confusion/SKILL.md) | Dependency confusion — npm/PyPI/NuGet/Maven namespace attacks, safe PoC methodology |
+| [`offensive-supply-chain`](Skills/supply-chain/offensive-supply-chain/SKILL.md) | Software supply chain — defensive provenance and release-control review |
+| [`offensive-dependency-confusion`](Skills/supply-chain/offensive-dependency-confusion/SKILL.md) | Dependency source policy — package scope, registry mapping, lockfile review |
 
 ### Social Engineering
 
@@ -312,8 +313,8 @@ Paste the contents of a `SKILL.md` into a Project's system prompt or prepend it 
 
 | Skill | Description |
 |---|---|
-| [`offensive-phishing`](Skills/social-engineering/offensive-phishing/SKILL.md) | Phishing — GoPhish, EvilGinx2, payload delivery, email authentication bypass |
-| [`offensive-social-engineering`](Skills/social-engineering/offensive-social-engineering/SKILL.md) | Social engineering — pretexting, vishing, smishing, physical SE, USB drops |
+| [`offensive-phishing`](Skills/social-engineering/offensive-phishing/SKILL.md) | Phishing awareness — inert simulations and tabletop exercises |
+| [`offensive-social-engineering`](Skills/social-engineering/offensive-social-engineering/SKILL.md) | Social-engineering awareness — defensive controls and tabletop scenarios |
 
 ### Network Attacks
 

