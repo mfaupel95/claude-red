@@ -28,3 +28,20 @@ Use existing build-to-lockfile-to-registry correlations to distinguish intended 
 - [Go: Module reference, proxies and private modules](https://go.dev/ref/mod)
 - [RubyGems/Bundler: Gemfile sources and source priority](https://guides.rubygems.org/gemfile/)
 - [Docker: Base-image selection and digest pinning](https://docs.docker.com/build/building/best-practices/)
+
+## Extended source-resolution evidence matrix
+
+Read only existing configuration and sanitized build/registry records; never run a restore, install, pull or resolver as part of this review. Record exact tool/version, effective configuration precedence and operation. If these are unavailable, explicitly exclude that ecosystem from the conclusion, not from the inventory.
+
+| Review question | Existing evidence | Expected control | Limitation |
+|---|---|---|---|
+| Are Go private module routes bounded? | go.mod/go.sum diffs, sanitized GOPROXY/GOPRIVATE/GONOPROXY/GONOSUMDB settings and existing module-download logs | Approved proxy/direct routes and private-prefix policy; reviewed module path/version/checksum changes | GOPROXY separator/fallback semantics and overrides matter; go.sum is not a source allowlist or complete lockfile; do not infer a public leak without network evidence |
+| Are Ruby dependencies tied to intended sources? | Gemfile source blocks, Gemfile.lock remote/revision diffs, sanitized Bundler configuration and existing build logs | Explicit approved source association, reviewed lockfile changes and controlled Git/path dependencies | Global/multiple sources and Bundler version affect resolution; lockfile alone does not establish runtime source or safety |
+| Are container references unambiguous? | Dockerfile/base-image and deployment manifest diffs, existing build logs and registry destination records | Fully qualified approved registry/repository plus reviewed digest pinning | Default registry/name normalization and mirror behavior depend on runtime/configuration; container resolution is not package-manager resolution |
+| Did a dependency source unexpectedly change? | Lockdiffs (URLs, hashes, revisions), sanitized historical build resolver logs and registry/proxy/DNS network alerts with time, host/job and destination | Correlate approved update with expected registry allowlist; review unapproved new destinations | Missing logs/caches/mirrors obscure actual fetches; an alert or changed hash is a lead, not proof of dependency confusion |
+
+### Additional official references
+
+- [Go module reference: private modules and proxy routing](https://go.dev/ref/mod#private-modules)
+- [RubyGems/Bundler Gemfile source semantics](https://guides.rubygems.org/gemfile/)
+- [Docker image pinning](https://docs.docker.com/build/building/best-practices/)

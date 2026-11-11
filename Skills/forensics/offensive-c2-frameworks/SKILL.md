@@ -41,3 +41,16 @@ Prefer tabletop injects, replay of sanitized historical telemetry, and harmless 
 
 - [MITRE ATT&CK: Command and Control](https://attack.mitre.org/tactics/TA0011/)
 - [MITRE ATT&CK: Application Layer Protocol](https://attack.mitre.org/techniques/T1071/)
+
+## Local process and lateral-channel coverage matrix
+
+Only inspect existing sanitized telemetry or synthetic records; do not generate traffic, open pipes, start processes or deploy frameworks. Fix an incident window (UTC start/end) and compare a documented baseline; the example windows below are correlation hypotheses, not universal detection thresholds. Verify deployed sensor/version/configuration and field availability before using a join.
+
+| Review question | Existing evidence (source, fields, window) | Expected control | Limitation / false positive |
+|---|---|---|---|
+| Can process relationships be reconstructed? | Existing Sysmon process events: UtcTime, host, ProcessGuid, ParentProcessGuid, Image, User; incident window plus 15 minutes on either side | Join by host/process GUID, preserve ancestry and application-control outcome | Retention or sensor gaps break ancestry; installers and management agents spawn unusual children |
+| Is IPC/Named Pipe activity attributable? | Existing Sysmon pipe-created/connected records, if enabled: UtcTime, host, ProcessGuid/ProcessId, Image, PipeName; correlate within 5 minutes of process event | Identify expected pipe owners/consumers and flag new process/pipe pairings for review | Named pipes cover only part of IPC; RPC, sockets and shared memory need separate documented sources; legitimate services use pipes |
+| Is SMB access tied to identity and endpoint? | Existing Windows share-audit records, if enabled: time, server, account/logon ID, client address, share/relative target, requested access and outcome; correlate within 15 minutes with endpoint/network records | Approved shares, least privilege and cross-host identity correlation | Audit settings determine available fields; backups/admin tools are common false positives; NAT/clock skew and PID reuse weaken joins |
+| Can cross-source gaps be distinguished from absence? | Collector health, enabled audit configuration and retention metadata over the full incident/baseline window | Coverage map by host/channel/time and explicit unknown cells | A pipe/SMB event is not a C2 verdict; missing telemetry is not evidence that communication did not occur |
+
+- [Microsoft Sysmon event coverage](https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon): process and pipe event availability depends on installed version and filtering; do not assume all events are enabled.
