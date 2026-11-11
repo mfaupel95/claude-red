@@ -22,7 +22,7 @@ This reference supports incident responders and authorized detection exercises. 
 2. Preserve volatile and nonvolatile evidence before making changes. Record source, collection time, time zone, tool/version, and cryptographic hashes.
 3. Acquire logs from independent sources: endpoint, identity, network, cloud control plane, and centralized collectors. Compare their time ranges and gaps.
 4. Correlate file metadata with filesystem journals, backups, endpoint records, and application logs. Treat timestamps as claims, not standalone proof.
-5. Document missing or altered evidence explicitly. Do not attempt to reconstruct or silently normalize it.
+5. Document missing or altered evidence explicitly. Keep originals unchanged; any reproducible reconstruction belongs only in a separately labeled derived timeline with sources, assumptions and uncertainty. Never silently normalize original evidence.
 6. Contain through approved response procedures while preserving chain of custody; record every action and operator.
 
 ## ATT&CK references
@@ -37,3 +37,13 @@ Use tabletop scenarios, vendor-provided benign test artifacts, or isolated dispo
 
 - [MITRE ATT&CK: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 - [NIST SP 800-86: Guide to Integrating Forensic Techniques into Incident Response](https://csrc.nist.gov/pubs/sp/800/86/final)
+
+## Evidence review matrix
+
+Keep original evidence byte-for-byte unchanged, read-only where feasible, with acquisition hashes and custody records. Create a **separate derived timeline**, never overwrite original timestamps or silently fill gaps. Retain source artifact/hash, record identifier, original timestamp/time zone, derived UTC time, clock-offset assumption, parser/version, transformation steps and uncertainty per row. Preserve the transformation recipe and inputs so another analyst can reproduce it; label inferred intervals separately from observed events.
+
+| Review question | Existing evidence | Expected control | Limitation |
+|---|---|---|---|
+| Is a log gap explained? | Already acquired Windows Security/System logs, collector receipt times, agent heartbeat and retention/policy records for the same host/window | Compare event time and ingestion time, record missing intervals and corroborate collection health independently | Rotation, outage, filtering or clock drift can explain gaps; an anomaly is not proof of tampering |
+| Do file times conflict? | Existing NTFS MFT and USN journal exports, backup catalog and EDR file events, each with source record/time-zone metadata | Correlate independent sources in the derived timeline; preserve competing time claims and uncertainty | Journal wrap, copy/restore and parser semantics limit inference; timestamps alone do not identify an actor |
+| Are non-Windows gaps covered? | Existing Linux journal boot IDs, audit records and centralized syslog receipt times, if acquired | Compare boot/session boundaries with retention and collector health | Sources may not exist or auditing may not have been enabled; record unavailable evidence rather than manufacture it |

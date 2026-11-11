@@ -35,3 +35,17 @@ Stop immediately if the exercise reaches an unintended recipient, requests or re
 
 - [CISA: Recognize and Report Phishing](https://www.cisa.gov/secure-our-world/recognize-and-report-phishing)
 - [NIST SP 800-50 Rev. 1: Building a Cybersecurity and Privacy Learning Program](https://csrc.nist.gov/pubs/sp/800/50/r1/final)
+
+## Evidence review matrix
+
+| Review question | Existing evidence | Expected control | Limitation |
+|---|---|---|---|
+| Does the message identity align? | Existing sanitized headers: trusted gateway Authentication-Results, Received chain, From/Reply-To/Return-Path and gateway verdict; no message secrets | SPF/DKIM/DMARC evaluation and alignment at the trusted mail boundary, reporting path | Forwarding and intermediaries affect results; attacker-supplied headers are untrusted; authentication pass does not make content safe |
+| Was identity-provider (IdP) access suspicious? | Existing sanitized IdP sign-in/risk events: time, account reference, application, device, source, authentication method and outcome; correlate to report window | Conditional access, independent verification, session response by authorized responders | Geolocation and risk scores are fallible; session compromise may not produce a new login |
+| Is MFA phishing-resistant? | Existing IdP policy and enrollment/exception metadata, recovery policy and aggregate method usage | FIDO2/WebAuthn with verifier-name binding or other approved phishing-resistant authentication; protect enrollment and recovery | SMS, OTP and ordinary push approvals are not phishing-resistant; MFA does not secure all sessions/endpoints; verify product support and policy enforcement |
+
+## Synthetic tabletop decision point
+
+**Learning goal:** independently verify a request and report it without submitting credentials. **Inject:** a fictional employee receives a printed mock urgent account notice; no real address, link, QR code or login form exists. **Moderator question:** “The mock header says authentication passed but the request asks for an unexpected sign-in; what do you trust and what do you do?” **Expected reaction:** do not follow the request, open the known-good service independently, report through the established channel, and let authorized responders correlate sanitized mail/IdP records. Debrief aggregate reasoning and response time, not individual blame.
+
+- [NIST SP 800-63B-4: phishing resistance](https://pages.nist.gov/800-63-4/sp800-63b.html)
