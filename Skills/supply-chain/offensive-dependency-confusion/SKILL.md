@@ -7,29 +7,24 @@ description: "Review dependency source policy and prevent package-confusion risk
 
 Use this skill to assess package-source configuration, namespace ownership, and lockfile integrity in authorized repositories. Do not publish lookalike packages, trigger installs, register public placeholders, or collect callbacks. A package being absent from a public registry is not proof of a vulnerability.
 
-## Review workflow
 
-1. Confirm repository and package-manager scope. Work from a local copy and use read-only configuration review first.
-2. Inventory manifests, lockfiles, repository configuration, environment overrides, mirrors, and package-source mappings.
-3. Determine the effective registry/source for each dependency using the exact package manager, version, project format, and operation. Do not generalize from source order or version numbers alone.
-4. Check whether private package names are scoped or mapped exclusively to approved sources. Review how unscoped names resolve and whether extra indexes, mirrors, `find-links`, or local sources add candidates.
-5. Verify lockfile URLs, hashes, provenance metadata, and review controls. Do not install an untrusted candidate to “prove” exposure.
-6. Record source-selection uncertainty and recommend namespace controls, explicit source mapping, pinned versions, hashes, and trusted mirrors.
+## Evidence-based source review
 
-## Package-manager cautions
+Use authorized, existing configuration and sanitized telemetry only. Record tool version, operation, overrides, evidence location, time window and coverage. Missing telemetry is unknown; public-name availability is not proof of exposure. Never install, resolve, publish packages or execute hooks to demonstrate a finding.
 
-- **npm:** registry selection depends on package scope mapping and the configured default registry. Review effective `.npmrc` settings and lockfile resolved URLs; a missing scope mapping does not itself prove fallback or exposure.
-- **pip:** candidate selection can involve all configured locations. Check index settings, extra indexes, `find-links`, trusted-host entries, environment variables, and configuration files. `--index-url` alone does not prove that no other source is active.
-- **NuGet:** behavior depends on project format and operation. For `PackageReference` restore, source order is not a universal priority rule. Use Package Source Mapping to constrain package IDs to approved sources and verify the effective configuration.
-- **Maven and Gradle:** resolution depends on mirrors, repository declarations, fixed versus dynamic versions, and tool version. Review effective settings and repository content filters; do not infer exposure from “highest version wins.”
+| Question | Existing evidence | Expected control | Limitation |
+|---|---|---|---|
+| Are npm sources constrained? | Effective sanitized .npmrc scope/default registry mappings, lockfile resolved URLs/integrities and existing build/registry request logs. | Map private scopes to approved registries and review lockfile/source changes. | Scope mappings, overrides and operation matter; a missing mapping alone does not prove fallback. |
+| Are pip candidates constrained? | Existing index/extra-index/find-links settings, environment override names, pinned hashes and build/registry logs. | Restrict all candidate locations to approved sources and review pinned artifacts. | An index URL alone does not exclude other sources; version priority is not a universal source policy. |
+| Are NuGet and JVM sources constrained? | NuGet.Config mappings; Maven mirrors/settings; Gradle content filters; lock/dependency verification files and retained restore logs. | Explicit package-source mapping or repository content rules, approved immutable versions and reviewed changes. | Source order is not universally authoritative; behavior depends on manager, version and operation. |
+| Are Go module routes and private paths controlled? | go.mod, go.sum, go.work/vendor metadata where present; sanitized GOPROXY, GOPRIVATE, GONOPROXY, GONOSUMDB settings; existing CI module-download and proxy/registry logs. | Match module paths to approved proxy/VCS routes; review replace/workspace overrides and deliberate private-path checksum policy. | GOPROXY comma fallback normally follows 404/410; pipe fallback follows any error. GOPRIVATE supplies defaults for GONOPROXY/GONOSUMDB, not an allowlist. go.sum is an integrity record, not a source lockfile or safety verdict. |
+| Are Ruby gem sources explicit? | Gemfile source blocks/:source/git/path declarations, Gemfile.lock remotes/revisions, Bundler version/config and retained build/registry logs. | One approved global source; explicitly bind private gems and review transitive dependencies and lockfile source changes. | Multiple global sources are deprecated; source blocks can affect available sources for other gems. A lockfile alone does not prove approved origin or harmless install behavior. |
+| Are container dependency sources explicit? | Dockerfiles for every stage, build argument values, image lock metadata if used, retained build/pull and registry audit logs with resolved digests/platforms. | Fully qualify approved registry/namespace and base images, pin reviewed digests, and constrain mirrors/proxies. | Short names, mutable tags and cache hits obscure origin; an image digest proves content identity, not publisher trust or safety. |
 
-## Safe validation
-
-Use offline fixtures or a private disposable registry with synthetic package names and no install hooks. Do not publish to public registries or trigger package resolution in other consumers. If a controlled registry test is necessary, require written approval from its owner, isolate it from production, and define cleanup and rollback beforehand.
+Use existing build-to-lockfile-to-registry correlations to distinguish intended policy from observed resolution. Do not fetch missing artifacts, enumerate public names or run builds. Report unresolved routes with an owner rather than asserting exploitation.
 
 ## References
 
-- [npm: Registry scopes](https://docs.npmjs.com/cli/v10/using-npm/scope)
-- [pip: Finding and choosing packages](https://pip.pypa.io/en/stable/cli/pip_install/#finding-packages)
-- [NuGet: Package Source Mapping](https://learn.microsoft.com/en-us/nuget/consume-packages/package-source-mapping)
-- [Gradle: Repository content filtering](https://docs.gradle.org/current/userguide/filtering_repository_content.html)
+- [Go: Module reference, proxies and private modules](https://go.dev/ref/mod)
+- [RubyGems/Bundler: Gemfile sources and source priority](https://guides.rubygems.org/gemfile/)
+- [Docker: Base-image selection and digest pinning](https://docs.docker.com/build/building/best-practices/)

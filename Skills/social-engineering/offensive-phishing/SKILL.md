@@ -5,33 +5,27 @@ description: "Design safe, authorized phishing-awareness exercises without colle
 
 # Phishing awareness: safe simulation design
 
-Use this reference for tabletop exercises or approved click-only awareness simulations. It does not support real credential collection, session-token capture, executable payload delivery, filter bypass, or impersonation of third parties.
+Use this reference for defensive evidence review and facilitator-led tabletop exercises only. It does not support real credential collection, session-token capture, executable payload delivery, filter bypass, or impersonation of third parties.
 
-## Exercise prerequisites
 
-1. Obtain written approval from the organization's security, legal, privacy, and communications owners.
-2. Define the recipient group, schedule, data collected, retention period, notification plan, and stop conditions.
-3. Use an organization-controlled training domain and landing page. Do not register lookalike third-party domains or use external redirection services.
-4. Make the exercise inert: no login fields, password prompts, cookies, tokens, attachments, macros, downloads, QR redirects, or code execution.
-5. Collect only the minimum aggregate outcome needed, such as click/no-click counts. Avoid recording message contents, personal browsing data, or sensitive identifiers.
-6. Provide a clear debrief and a non-punitive reporting path. Delete or aggregate exercise data under the approved retention plan.
+## Evidence-based defensive review
 
-## Tabletop alternative
+Use only authorized, existing, sanitized records. Record evidence location, time window, owner, and coverage; mark unavailable evidence as unknown, not passed. Never retrieve credential or token values.
 
-Use synthetic personas, mock messages, and facilitator-led decision points. Discuss reporting, verification, and escalation without sending messages to real recipients or collecting responses from real accounts.
+| Question | Existing evidence | Expected control | Limitation |
+|---|---|---|---|
+| Does the apparent sender match the authenticated domain and delivery path? | Sanitized From/Reply-To, Return-Path, trusted Received hops, gateway Authentication-Results (SPF/DKIM/DMARC), message trace and verdicts. | Domain alignment, external labels, attachment/URL controls, and a reporting route. | Trust only headers added within the receiving trust boundary; forwarding can affect authentication. Authentication success does not prove benign intent. |
+| Do message and identity signals agree? | Existing gateway detections, user reports, IdP sign-in risk, device/session metadata, MFA/reset and consent audit events correlated by time. | Triage correlated anomalies and escalate through the incident owner; preserve minimal evidence. | Risk scores, IP changes, and unusual geography are signals, not proof; retention and licensing constrain coverage. |
+| Is phishing-resistant MFA enforced? | Effective IdP authentication-strength policies, scoped users/apps, exclusions, enrollment and sanitized sign-in method results. | Require FIDO2/passkeys or other provider-supported phishing-resistant methods; review recovery, legacy authentication and exceptions. | SMS, OTP and push approval alone are not phishing-resistant; enrollment is not enforcement and MFA does not eliminate session compromise. |
+| Can staff report safely and responders act? | Existing reporting tickets, response timestamps, escalation policy and approved aggregate training outcomes. | Known-good verification channels, non-punitive reporting, accessible guidance and an accountable responder. | Awareness metrics do not establish technical prevention or individual susceptibility. |
 
-## Defensive review checklist
+## Facilitator-only tabletop
 
-- Confirm external sender labeling, domain authentication, attachment controls, URL inspection, and reporting workflows.
-- Review training materials for accessibility, privacy, and non-punitive language.
-- Measure aggregate reporting and response time, not credential entry or individual susceptibility.
-- Coordinate with help desk and incident response so the exercise does not trigger unplanned containment actions.
-
-## Stop conditions
-
-Stop immediately if the exercise reaches an unintended recipient, requests or receives credentials, causes operational disruption, or collects data outside the approved plan. Notify the owner and preserve only the minimum evidence required for the incident review.
+With written owner approval, use fictional personas, inert mock message cards and synthetic mail-header/IdP event summaries. A moderator pauses at each decision: identify signals, verify through a known-good channel, report, then assign incident triage. Send nothing, open no links, and use no real accounts, QR codes, login fields, attachments or response tracking. Record aggregate decisions and control gaps, not participant rankings. Stop for distress, real personal data, credentials or operational impact; debrief and assign improvements.
 
 ## References
 
-- [CISA: Recognize and Report Phishing](https://www.cisa.gov/secure-our-world/recognize-and-report-phishing)
-- [NIST SP 800-50 Rev. 1: Building a Cybersecurity and Privacy Learning Program](https://csrc.nist.gov/pubs/sp/800/50/r1/final)
+- [Microsoft: Anti-spam message headers](https://learn.microsoft.com/en-us/defender-office-365/message-headers-eop-mdo)
+- [Microsoft: Authentication strengths](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-strengths)
+- [CISA: Recognize and Report Phishing (archived awareness guidance)](https://www.cisa.gov/secure-our-world/recognize-and-report-phishing)
+- [NIST SP 800-50 Rev. 1: Learning programs](https://csrc.nist.gov/pubs/sp/800/50/r1/final)
