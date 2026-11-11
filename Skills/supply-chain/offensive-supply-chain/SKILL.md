@@ -30,3 +30,15 @@ Report policy expectations separately from observed enforcement. Route suspected
 - [Sigstore: Signature, identity and digest verification](https://docs.sigstore.dev/cosign/verifying/verify/)
 - [Docker: Base-image selection and digest pinning](https://docs.docker.com/build/building/best-practices/)
 - [Reproducible Builds: Definition and bit-for-bit verification](https://reproducible-builds.org/docs/definition/)
+
+## Artifact trust evidence review matrix
+
+| Review question | Existing evidence | Expected control | Limitation |
+|---|---|---|---|
+| Is the registry and base-image origin explicit? | Existing Dockerfile/build/deployment manifests and sanitized build records naming registry, repository, base-image publisher and platform | Fully qualified approved registries and reviewed base-image provenance | Familiar names, mirrors and “official” labels do not independently prove origin or safety |
+| Can mutable tags change the artifact? | Existing tag-to-digest history, manifest/index and platform-specific digest records | Reviewed digest pinning and recorded update approval; compare build and deployed digests | Tags are mutable; a digest fixes content identity, not trust; a multi-platform index differs from a platform manifest |
+| Is the signer the expected one for this release? | Existing signature/provenance verification report: artifact digest, signer key/identity, issuer, trusted-root/policy version and verification time | Explicit expected signer/issuer and source/build identity policy, with revocation/rotation handling | A valid signature from an unexpected identity is insufficient; expected signing does not prove benign code |
+| Is there independent rebuild evidence? | Already available independent builder report: source commit, materials/base digests, toolchain, build recipe/environment, output digests and comparison method | Independently controlled rebuild with matching declared inputs and documented byte/semantic comparison | Same pipeline repeating a build is not independent; nondeterminism can explain differences; do not claim reproducibility from a provenance document alone |
+| Which evidence is missing? | Evidence inventory linking each claim to retained reports, with missing inputs, inaccessible builder logs and verification failures marked explicitly | Record verified/contradicted/unknown per claim, owner and follow-up; gate release per policy | No rebuild or signer evidence means unknown, not trusted or compromised; this review does not perform builds or retrieve suspicious artifacts |
+
+- [Docker: base-image selection and digest pinning](https://docs.docker.com/build/building/best-practices/)

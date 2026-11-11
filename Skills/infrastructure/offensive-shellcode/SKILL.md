@@ -3,7 +3,7 @@ name: offensive-shellcode
 description: "Shellcode concepts and defensive analysis for authorized isolated labs. Use for static triage, telemetry interpretation, and mitigation review; not for payload construction, deployment, or evasion."
 ---
 
-## Shellcode Development Workflow
+## Shellcode Analysis and Triage Workflow
 
 1. Confirm written authorization, scope, and isolated lab boundaries.
 2. Identify the platform and analyze code statically first.
@@ -31,26 +31,11 @@ A sample may move memory from writable to executable before transferring control
 
 ---
 
-## Windows API Resolution (PEB Walk)
+## Static API-resolution indicators
 
-Identifying `kernel32.dll` without imports:
+Review only existing disassembly or analyst reports for process-environment/loader-list references, module-name comparisons or hashes, export-table parsing, and dynamically resolved APIs. Record file hash, offsets, architecture and uncertainty; do not turn these observations into an implementation sequence. Sparse imports and dynamic resolution also occur in benign software.
 
-1. Get `PEB` via `gs:[0x60]` (x64) or `fs:[0x30]` (x86)
-2. Walk `PEB->Ldr.InMemoryOrderModuleList` — order: exe → ntdll → kernel32
-3. Hash-compare module names to locate `kernel32`
-4. Parse the Export Address Table (EAT)
-5. Find `GetProcAddress` by name hash, then resolve `LoadLibraryA`
-6. Use `LoadLibraryA` to load `WS2_32.dll`, resolve Winsock functions
-
-**WinDbg helpers for debugging PEB walk:**
-```bash
-dt nt!_TEB -y ProcessEnvironmentBlock @$teb
-dt nt!_PEB -y Ldr <peb_addr>
-dt -r _PEB_LDR_DATA <ldr_addr>
-dt _LDR_DATA_TABLE_ENTRY (<init_flink_addr> - 0x10)
-lm m kernel32   # verify base address
-r @r8           # check register
-```
+There is no fixed loader-module order to rely on. Internal Windows structures and offsets are build/architecture dependent; use matching symbols and authoritative documentation rather than an assumed executable/ntdll/kernel32 ordering. No debugger commands, loader construction or sample execution are required here.
 
 ---
 
@@ -86,3 +71,15 @@ For learning and defensive validation:
 - If execution behavior must be studied, use a disposable VM snapshot with host-only networking, no shared folders or clipboard, and a documented rollback plan.
 - Record hashes, process/memory events, and detections; preserve logs and artifacts for analysis rather than clearing them.
 - For defensive testing, validate controls through benign telemetry or vendor-provided test artifacts, and coordinate scope and stop conditions with the system owner.
+
+## Evidence review matrix
+
+| Review question | Existing evidence | Expected control | Limitation |
+|---|---|---|---|
+| Are executable mappings unexpected? | Approved existing memory-map export: process identity, region type, permissions, capture time; compare known-good JIT activity | Memory protections (DEP/NX, W^X where supported), reviewed exceptions | Snapshot coverage is partial; JIT/private executable memory is not proof of shellcode; do not change permissions or execute samples |
+| Is application control enforced? | Existing policy export and allow/block/audit events correlated to image identity and signer | Application Control policy with reviewed trust rules and enforcement evidence | Audit mode is not enforcement; a trusted signer is not proof of safety; platform/build support differs |
+| Can the behavior actually be observed? | Existing EDR/process/memory events, enabled sensor configuration, retention window and dropped-event counters | Document coverage, correlation keys and collection health | API calls and memory transitions may not be collected; no event is not evidence of absence |
+
+## Official platform reference
+
+- [Microsoft: PEB_LDR_DATA](https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb_ldr_data): internal structure may change; use build-matched symbols. No fixed module ordering is assumed.
