@@ -5,9 +5,9 @@ description: "Shellcode concepts and defensive analysis for authorized isolated 
 
 ## Shellcode Analysis and Triage Workflow
 
-1. Confirm written authorization, scope, and isolated lab boundaries.
+1. Confirm written authorization, scope, and approved existing evidence sources.
 2. Identify the platform and analyze code statically first.
-3. Use inert, non-networked test stubs for controlled validation.
+3. Use existing analysis reports or synthetic telemetry for validation; do not execute samples or test stubs.
 4. Record hashes, telemetry, and results; preserve evidence and logs.
 5. Stop if validation could affect production or third-party systems.
 
@@ -43,12 +43,12 @@ There is no fixed loader-module order to rely on. Internal Windows structures an
 
 - Compare PE sections, imports, resources, certificate metadata, and file overlays with a known-good build where available.
 - Runtime API resolution or sparse imports can justify closer review, but neither proves maliciousness.
-- Treat packed, encrypted, or high-entropy regions as triage indicators. Do not attempt to execute or unpack untrusted material outside an approved isolated lab.
+- Treat packed, encrypted, or high-entropy regions as triage indicators. Do not execute or unpack untrusted material as part of this review.
 - Do not infer that a PE remains validly signed after modification. Verify the signature and its coverage with trusted tooling.
 
 ## Detection engineering
 
-Correlate executable private memory, cross-process access, permission changes, unusual thread starts, and process ancestry. Validate detections with benign telemetry or vendor test artifacts, not covert payloads. Preserve event logs and sample provenance.
+Correlate executable private memory, cross-process access, permission changes, unusual thread starts, and process ancestry. Validate detection logic against existing sanitized telemetry or synthetic records, not executable artifacts or payloads. Preserve event logs and sample provenance.
 
 ---
 
@@ -62,15 +62,15 @@ Correlate executable private memory, cross-process access, permission changes, u
 
 ## Safe Lab Validation and Defensive Review
 
-Use this reference only for systems and experiments explicitly authorized in writing. Keep validation in an isolated, disposable lab with no route to production or third-party systems. Do not build or deploy covert loaders, callback payloads, credential theft, persistence, or evasion mechanisms from this document.
+Use this reference only for systems and experiments explicitly authorized in writing. Limit validation to existing analysis reports and synthetic telemetry; lab isolation or separate authorization does not permit sample execution under this skill. Do not build or deploy covert loaders, callback payloads, credential theft, persistence, or evasion mechanisms from this document.
 
 For learning and defensive validation:
 
-- Review sample assembly and binaries statically; do not execute unknown shellcode on a host containing real data or credentials.
-- Use inert, non-networked test stubs and synthetic input. Avoid real callbacks, process injection, or endpoint-security bypasses.
-- If execution behavior must be studied, use a disposable VM snapshot with host-only networking, no shared folders or clipboard, and a documented rollback plan.
+- Review existing disassembly and analyst reports statically; do not execute shellcode or other samples.
+- Use synthetic event records, not executable test stubs. No callbacks, process injection, or endpoint-security bypasses.
+- Assess execution behavior only through existing analysis reports or synthetic telemetry; record provenance, collection context and uncertainty without executing the artifact.
 - Record hashes, process/memory events, and detections; preserve logs and artifacts for analysis rather than clearing them.
-- For defensive testing, validate controls through benign telemetry or vendor-provided test artifacts, and coordinate scope and stop conditions with the system owner.
+- For defensive testing, review controls against existing sanitized telemetry or synthetic records, and coordinate scope and stop conditions with the system owner.
 
 ## Evidence review matrix
 

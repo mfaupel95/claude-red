@@ -5,7 +5,7 @@ description: "Review command-and-control indicators and defensive controls in au
 
 # Command-and-control: defensive review
 
-Use this reference to assess detection coverage and investigate suspected C2 activity. It does not provide implant, redirector, listener, credential-access, or evasion instructions. Do not deploy C2 software or contact infrastructure unless a separate written authorization explicitly permits it; prefer telemetry-only simulations.
+Use this reference to assess detection coverage and investigate suspected C2 activity. It does not provide implant, redirector, listener, credential-access, or evasion instructions. Review only existing sanitized telemetry or synthetic records. Do not create or run implants, listeners or callbacks, deploy C2 software, or contact infrastructure; separate authorization does not expand this skill's telemetry-only scope.
 
 ## Behavior patterns
 
@@ -22,7 +22,7 @@ Use this reference to assess detection coverage and investigate suspected C2 act
 2. Review egress policy, DNS resolver configuration, proxy logs, endpoint process lineage, and identity events using read-only access.
 3. Correlate network metadata with process, user, device, and cloud records. Preserve packet captures and relevant logs under the incident evidence process.
 4. Treat JA3/JA4, TLS certificates, domain age, and beacon-like timing as non-unique signals. Correlate multiple independent indicators before attribution.
-5. Validate detection logic with synthetic events or vendor-provided benign test data. Do not create implants, redirectors, callbacks, or covert channels for a routine validation.
+5. Validate detection logic with synthetic events or vendor-provided benign test data. Do not create implants, redirectors, callbacks, or covert channels for validation under this skill.
 6. Document false positives, telemetry gaps, data limitations, and response actions.
 
 ## Controls to assess
@@ -35,7 +35,7 @@ Use this reference to assess detection coverage and investigate suspected C2 act
 
 ## Safe exercise boundary
 
-Prefer tabletop injects, replay of sanitized historical telemetry, and harmless detection test records. Do not use real credentials, external callbacks, live implants, persistence, traffic disguise, or log deletion. Stop if activity reaches an out-of-scope system.
+Use only tabletop injects, existing sanitized historical telemetry, and synthetic detection records. Do not use real credentials, external callbacks, live implants, persistence, traffic disguise, or log deletion. Stop if activity reaches an out-of-scope system.
 
 ## References
 
